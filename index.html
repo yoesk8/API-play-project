@@ -15,19 +15,25 @@
         #issMap {
             height: 180px;
         }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
     
 
-    <h1>Where is the the ISS??</h1>
-
+    <h1>Where is the International Space Station right now??</h1>
+    
     <p>latitude: <span id="lat"></span></p>
     <p>longitude: <span id="lon"></span></p>
 
     <div id="issMap"></div>
+</div>
 
     <script> 
+
+
     //Creating Map and Tiles
     const map = L.map('issMap').setView([0, 0], 1);
     const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -46,23 +52,35 @@
 
 
     
+     //Calling the API
+     const api_url = 'https://api.wheretheiss.at/v1/satellites/25544';
 
-     const api_url = 'https://api.wheretheiss.at/v1/satellites/25544'
+      let firstTime = true;
+
      async function getISS(){
         const response = await fetch(api_url);
         const data = await response.json();
         const {latitude, longitude} = data;
 
-        // Location added to map
+        // Adding Location to map
          marker.setLatLng([latitude, longitude]);
-        document.getElementById('lat').textContent = latitude;
-        document.getElementById('lon').textContent = longitude;
+         if (firstTime){
+         map.setView([latitude,longitude], 2);
+         firstTime = false;
+        }
+
+        document.getElementById('lat').textContent = latitude.toFixed(2);;
+        document.getElementById('lon').textContent = longitude.toFixed(2);
         console.log(latitude);
         console.log(longitude);
 
      }
 
      getISS();
+      
+      
+     //Calls the getISS function every 1 second
+     setInterval(getISS, 1000);
     </script>
 </body>
 </html>
